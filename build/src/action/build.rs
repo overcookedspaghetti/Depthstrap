@@ -11,10 +11,10 @@ pub fn main() {
 
     log::info!("Executing Build");
     let path: String = path::git_root()
-        .join("Froststrap/Froststrap.csproj")
+        .join("Depthstrap/Depthstrap.csproj")
         .into_string()
         .unwrap();
-    log::info!("Froststrap path: {}", path);
+    log::info!("Depthstrap path: {}", path);
     let config = args.configuration;
     let output_path = path::dotnet_build_artifacts().into_string().unwrap();
     let rust_target_triple = arch::rust_triple();

@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NLog;
 
-namespace Froststrap.Backend;
+namespace Depthstrap.Backend;
 
 /// Routes log records from the native libraries into the host's NLog pipeline.
 public static unsafe class NativeLog

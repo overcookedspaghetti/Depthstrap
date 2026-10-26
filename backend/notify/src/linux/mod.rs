@@ -18,7 +18,7 @@ pub fn send_notification(title: String, description: String) -> i32 {
     };
 
     let meta = NotificationMeta {
-        app_name: "Froststrap".into(),
+        app_name: "Depthstrap".into(),
         replaces_id: ReplacesId::New,
         app_icon: "dialog-information".into(),
         summary: title,

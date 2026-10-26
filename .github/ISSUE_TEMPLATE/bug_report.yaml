@@ -19,8 +19,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: Froststrap Version
-      description: "What version of Froststrap are you using?"
+      label: Depthstrap Version
+      description: "What version of Depthstrap are you using?"
       placeholder: "v1.2.3"
     validations:
       required: true

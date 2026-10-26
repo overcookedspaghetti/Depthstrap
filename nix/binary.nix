@@ -8,21 +8,21 @@
 }:
 let
   src = fetchurl {
-    url = "https://github.com/Froststrap/Froststrap/releases/download/v${version}/Froststrap-linux-x64.AppImage";
+    url = "https://github.com/overcookedspaghetti/Depthstrap/releases/download/v${version}/Depthstrap-linux-x64.AppImage";
     inherit sha256;
   };
 
   appimageContents = appimageTools.extractType2 {
     inherit version src;
-    pname = "froststrap";
+    pname = "depthstrap";
   };
 
   desktopItem = makeDesktopItem {
-    name = "froststrap";
-    desktopName = "Froststrap";
+    name = "depthstrap";
+    desktopName = "Depthstrap";
     comment = "A cross-platform Roblox bootstrapper, focused on performance and customization.";
-    exec = "froststrap %u";
-    icon = "froststrap";
+    exec = "depthstrap %u";
+    icon = "depthstrap";
     categories = [ "Game" ];
     mimeTypes = [
       "x-scheme-handler/roblox"
@@ -33,7 +33,7 @@ let
   };
 in
 appimageTools.wrapType2 {
-  pname = "froststrap";
+  pname = "depthstrap";
   inherit version src;
 
   extraPkgs =
@@ -44,19 +44,19 @@ appimageTools.wrapType2 {
 
   # list values must end with ";". makeDesktopItem omits it.
   extraInstallCommands = ''
-    install -Dm644 ${desktopItem}/share/applications/froststrap.desktop \
-        $out/share/applications/froststrap.desktop
+    install -Dm644 ${desktopItem}/share/applications/depthstrap.desktop \
+        $out/share/applications/depthstrap.desktop
 
     sed -i -E '/^(Categories|MimeType)=/ s/([^;])$/\1;/' \
-        $out/share/applications/froststrap.desktop
+        $out/share/applications/depthstrap.desktop
 
-    install -Dm644 ${appimageContents}/usr/share/icons/hicolor/scalable/apps/Froststrap.png \
-        $out/share/icons/hicolor/512x512/apps/froststrap.png
+    install -Dm644 ${appimageContents}/usr/share/icons/hicolor/scalable/apps/Depthstrap.png \
+        $out/share/icons/hicolor/512x512/apps/depthstrap.png
   '';
 
   meta = {
     description = "A cross-platform Roblox bootstrapper, focused on performance and customization.";
-    homepage = "https://froststrap.xyz/";
+    homepage = "https://depthstrap.xyz/";
     license = lib.licenses.mpl20;
     platforms = [ "x86_64-linux" ];
   };

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 {
-  description = "Flake for Froststrap";
+  description = "Flake for Depthstrap";
 
   nixConfig = {
     extra-substituters = [ "https://invra.cachix.org" ];
@@ -36,7 +36,7 @@
           inherit system;
         };
 
-        froststrap = pkgs.callPackage ./nix/package.nix { };
+        depthstrap = pkgs.callPackage ./nix/package.nix { };
       in
       {
         devShells =
@@ -65,8 +65,8 @@
           ] { nameOverride = "default"; };
 
         packages = {
-          inherit froststrap;
-          default = froststrap;
+          inherit depthstrap;
+          default = depthstrap;
         };
 
         formatter = (pkgs.callPackage ./nix/formatter.nix { }) inputs;
@@ -74,8 +74,8 @@
     )
     // {
       overlays.default = final: prev: {
-        froststrap = final.callPackage ./nix/package.nix { };
-        mkFroststrap = args: final.callPackage ./nix/binary.nix args;
+        depthstrap = final.callPackage ./nix/package.nix { };
+        mkDepthstrap = args: final.callPackage ./nix/binary.nix args;
       };
     };
 }

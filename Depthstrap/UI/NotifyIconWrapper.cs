@@ -1,0 +1,262 @@
+﻿// SPDX-FileCopyrightText: 2026 Froststrap
+//
+// SPDX-License-Identifier: MPL-2.0
+
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Platform;
+using Avalonia.Threading;
+using Depthstrap.Integrations;
+using Depthstrap.UI.Elements.ContextMenu;
+
+namespace Depthstrap.UI
+{
+    internal class NotifyIconWrapper : IDisposable
+    {
+        private bool _isDisposed;
+#pragma warning disable CA2213
+        private readonly TrayIcon _trayIcon;
+#pragma warning restore CA2213
+        private readonly MenuContainer _menuContainer;
+        private readonly Watcher _watcher;
+        private ActivityWatcher? ActivityWatcher => _watcher.ActivityWatcher;
+
+        private DateTime _lastClickTime = DateTime.MinValue;
+        private const int DoubleClickThresholdMs = 300;
+
+        private static uint RandomSerial()
+        {
+            var bytes = new byte[4];
+            System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
+            return BitConverter.ToUInt32(bytes, 0) | 1u;
+        }
+
+        public NotifyIconWrapper(Watcher watcher)
+        {
+#if __APPLE__
+            if (App.Settings.Prop.LaunchWithVirtualDisplay) Dispatcher.UIThread.Post(() =>
+            {
+                App.Logger.Debug("Starting Virtual display");
+                // this currently will just emulate pretty much the old VDSP
+                // just different name and more modes
+                //
+                // TODO:
+                // make this read from config so we can config
+                // with new values.
+                void InitAndStart(uint serial) => Depthstrap.Backend.VirtualDisplay.Initialize(
+                    App.Settings.Prop.VirtualDisplayName,
+                    App.Settings.Prop.VirtualDisplayWidth,
+                    App.Settings.Prop.VirtualDisplayHeight,
+                    [60.0, 120.0, 240.0],
+                    serial
+                );
+
+                InitAndStart(App.Settings.Prop.VirtualDisplaySerial);
+
+                var result = Depthstrap.Backend.VirtualDisplay.Start();
+                if (result != -2) return;
+
+                App.Logger.Warn("Virtual display identity rejected, rotating serial");
+
+                var rotated = RandomSerial();
+                App.Settings.Prop.VirtualDisplaySerial = rotated;
+
+                InitAndStart(rotated);
+                Depthstrap.Backend.VirtualDisplay.Start();
+            });
+#endif
+            App.Logger.Info("Initializing TrayIcon");
+
+            _watcher = watcher;
+            _menuContainer = new MenuContainer(_watcher);
+
+            var nativeMenu = NativeMenu.GetMenu(_menuContainer);
+
+            var iconUri = new Uri("avares://Depthstrap/Depthstrap.ico");
+            long iconBytes;
+            using (var s = AssetLoader.Open(iconUri)) iconBytes = s.Length;
+
+            _trayIcon = new TrayIcon
+            {
+                Icon = new WindowIcon(AssetLoader.Open(iconUri)),
+                ToolTipText = "Depthstrap",
+                Menu = nativeMenu
+            };
+
+            App.Logger.Debug(
+                $"Tray: uiThread={Dispatcher.UIThread.CheckAccess()} " +
+                $"iconBytes={iconBytes} " +
+                $"menu={(_trayIcon.Menu is null ? "null" : "set")} " +
+                $"exporter={(_trayIcon.NativeMenuExporter is null ? "null" : "set")} " +
+                $"iconsCollection={(TrayIcon.GetIcons(Application.Current!) is null ? "null" : "set")} " +
+                $"visible={_trayIcon.IsVisible}");
+
+            _trayIcon.Clicked += OnTrayIconClicked;
+            App.Logger.Debug("Subscribed _trayIcon.Clicked to OnTrayIconClicked");
+
+            if (ActivityWatcher is not null && App.Settings.Prop.ShowServerDetails)
+            {
+                if (App.Settings.Prop.ShowServerUptime)
+                    ActivityWatcher.ShowNotif += ShowNotification;
+                else
+                    ActivityWatcher.OnGameJoin += ShowNotification;
+            }
+
+            var app = Application.Current!;
+            var icons = TrayIcon.GetIcons(app);
+            if (icons is null)
+            {
+                icons = [];
+                TrayIcon.SetIcons(app, icons);
+            }
+            icons.Add(_trayIcon);
+        }
+
+        private void OnTrayIconClicked(object? sender, EventArgs e)
+        {
+            if (!OperatingSystem.IsWindows())
+                return;
+
+            DateTime now = DateTime.Now;
+            double elapsed = (now - _lastClickTime).TotalMilliseconds;
+
+            if (elapsed <= DoubleClickThresholdMs)
+            {
+                _lastClickTime = DateTime.MinValue;
+                HandleDoubleClickAction();
+            }
+            else
+            {
+                _lastClickTime = now;
+            }
+        }
+
+        private void HandleDoubleClickAction()
+        {
+            switch (App.Settings.Prop.DoubleClickAction)
+            {
+                case TrayDoubleClickAction.None:
+                    _ = Frontend.ShowMessageBox("You don't have the double-click action set to anything.", MessageBoxImage.Information);
+                    break;
+
+                case TrayDoubleClickAction.GameHistory:
+                    if (!App.Settings.Prop.ShowGameHistoryMenu)
+                    {
+                        _ = Frontend.ShowMessageBox("Enable 'Game History' in settings to use this feature.", MessageBoxImage.Information);
+                        return;
+                    }
+                    var history = new ServerHistory(ActivityWatcher!);
+                    history.Show();
+                    break;
+
+                case TrayDoubleClickAction.ServerInfo:
+                    if (!App.Settings.Prop.ShowServerDetails)
+                    {
+                        _ = Frontend.ShowMessageBox("Enable 'Query Server Location' in settings to use this feature.", MessageBoxImage.Information);
+                        return;
+                    }
+
+                    if (ActivityWatcher?.InGame == true)
+                        _menuContainer.ShowServerInformationWindow();
+                    else
+                        _ = Frontend.ShowMessageBox("Join a game first to view server information.", MessageBoxImage.Information);
+                    break;
+            }
+        }
+
+        public async void ShowNotification(object? sender, EventArgs e)
+        {
+            App.Logger.Debug("Dispatching event notfification");
+            if (ActivityWatcher?.Data == null) return;
+
+            string title = ActivityWatcher.Data.ServerType switch
+            {
+                ServerType.Public => Strings.ContextMenu_ServerInformation_Notification_Title_Public,
+                ServerType.Private => Strings.ContextMenu_ServerInformation_Notification_Title_Private,
+                ServerType.Reserved => Strings.ContextMenu_ServerInformation_Notification_Title_Reserved,
+                _ => ""
+            };
+
+            string? serverLocation = await ActivityWatcher.Data.QueryServerLocation();
+            if (string.IsNullOrEmpty(serverLocation))
+            {
+                App.Logger.Error("Couldn't connect to ipinfo.io");
+                ShowAlert(
+                    string.Format(CultureInfo.InvariantCulture, Strings.Dialog_Connectivity_UnableToConnect, "ipinfo.io"),
+                    Strings.ActivityWatcher_LocationQueryFailed,
+                    5
+                );
+                return;
+            }
+
+            if (!App.Settings.Prop.ShowServerUptime)
+            {
+                string? serverID = ActivityWatcher.Data.JobId;
+                ShowAlert(title, string.Format(CultureInfo.InvariantCulture, Strings.ContextMenu_ServerDetails_Notification_Text_ServerID, serverLocation, serverID));
+            }
+            else
+            {
+                TimeSpan _serverUptime = DateTime.UtcNow - (ActivityWatcher.Data.StartTime ?? DateTime.UtcNow);
+                string serverUptime = _serverUptime.TotalMinutes < 1
+                    ? Strings.Common_JustStarted
+                    : Time.FormatTimeSpan(_serverUptime);
+
+                ShowAlert(title, string.Format(CultureInfo.InvariantCulture, Strings.ContextMenu_ServerDetails_Notification_Text, serverLocation, serverUptime));
+            }
+        }
+
+        private void ShowAlert(string title, string message, int duration = 5)
+        {
+            App.Logger.Debug("Dispatching Alert");
+            if (_isDisposed) return;
+
+            Backend.NativeNotify.SendMessage(
+                title,
+                message,
+                duration
+            );
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed) return;
+            _isDisposed = true;
+
+#if __APPLE__
+            var vdr = Depthstrap.Backend.VirtualDisplay.Running();
+            App.Logger.Info($"Virtual Display result = {vdr}");
+            if (vdr) {
+                App.Logger.Debug("Exiting Virtual Display");
+                Depthstrap.Backend.VirtualDisplay.End();
+            }
+#endif
+            App.Logger.Info("Cleaning up TrayIcon and MenuContainer");
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                try
+                {
+                    _trayIcon.IsVisible = false;
+
+                    var trayIcons = TrayIcon.GetIcons(Application.Current!);
+                    trayIcons?.Remove(_trayIcon);
+
+                    _menuContainer.Close();
+                    _trayIcon.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.Error($"Error during cleanup: {ex.Message}");
+                }
+            });
+
+            if (ActivityWatcher is not null)
+            {
+                ActivityWatcher.ShowNotif -= ShowNotification;
+                ActivityWatcher.OnGameJoin -= ShowNotification;
+            }
+
+            GC.SuppressFinalize(this);
+        }
+    }
+}

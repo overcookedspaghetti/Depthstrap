@@ -1,0 +1,170 @@
+// SPDX-FileCopyrightText: 2026 Froststrap
+//
+// SPDX-License-Identifier: MPL-2.0
+
+using NLog;
+using Avalonia;
+using Velopack;
+using Depthstrap;
+using Depthstrap.Backend;
+using Depthstrap.Cli;
+using System.Diagnostics;
+#if _WIN32
+using System.Runtime.InteropServices;
+#endif
+
+namespace Depthstrap;
+
+sealed class Program
+{
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+    internal static readonly Stopwatch StartupTimer = Stopwatch.StartNew();
+
+#if _WIN32
+    private const int AttachParentProcess = -1;
+
+    [DllImport("kernel32.dll")]
+    private static extern bool AllocConsole();
+
+    [DllImport("kernel32.dll")]
+    private static extern bool AttachConsole(int dwProcessId);
+#endif
+
+    [STAThread]
+    public static int Main(string[] args)
+    {
+#if (_WIN32 || __linux__) && DEPTHSTRAP_AOT
+        Utility.AotNativeLibraryExtractor.Extract();
+#endif
+        AppInitializer.InitializeNativeResolvers();
+
+        VelopackApp.Build()
+            .SetAutoApplyOnStartup(false)
+            .OnAfterInstallFastCallback(v => UriHandler.RegisterProtocolHandlers())
+            .OnAfterUpdateFastCallback(v => UriHandler.RegisterProtocolHandlers())
+            .OnBeforeUninstallFastCallback(v => UriHandler.UnregisterProtocolHandlers())
+            .Run();
+
+        // shim to convert old args to new ones
+        string[] launchArgs = args.Length == 0 ? [] : LegacyArgs.Normalize(args);
+
+#if _WIN32
+        if (launchArgs.Any(static a => a is "--console" or "-c"))
+            AllocConsole();
+#endif
+
+        var assembly = typeof(App).Assembly;
+        LogManager.Setup().LoadConfigurationFromAssemblyResource(assembly, "NLog.config");
+        GlobalDiagnosticsContext.Set("logRoot", Paths.Logs);
+        GlobalDiagnosticsContext.Set("startTime", DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture));
+        NativeLog.Register();
+
+        if (launchArgs.Length == 0)
+        {
+            App.LaunchSettings = new LaunchSettings(new DepthstrapCliCommand(), launchArgs);
+        }
+        else
+        {
+            var parseResult = DotMake.CommandLine.Cli.Parse<DepthstrapCliCommand>(launchArgs);
+
+            if (LegacyArgs.RequestsHelpOrVersion(launchArgs))
+            {
+                AttachParentConsole();
+                int exitCode = parseResult.ParseResult.Invoke();
+                LogManager.Shutdown();
+                return exitCode;
+            }
+
+            if (parseResult.ParseResult.Errors.Count > 0)
+            {
+                AttachParentConsole();
+
+                foreach (var parseError in parseResult.ParseResult.Errors)
+                {
+                    Console.Error.WriteLine(parseError.Message);
+                    Logger.Error(parseError.Message);
+                }
+
+                LogManager.Shutdown();
+                return (int)ErrorCode.ERROR_CANCELLED;
+            }
+
+            var cli = parseResult.Bind<DepthstrapCliCommand>();
+            App.LaunchSettings = new LaunchSettings(cli, launchArgs);
+        }
+
+        var launchSettings = App.LaunchSettings;
+
+        if (launchSettings.UnknownArgs.Count > 0)
+        {
+            var unknown = launchSettings.UnknownArgs;
+            Logger.Error($"{unknown.Count} unrecognized argument(s): {string.Join(", ", unknown)}");
+            LogManager.Shutdown();
+            return (int)ErrorCode.ERROR_CANCELLED;
+        }
+
+        if (launchArgs.Length != 0)
+            Logger.Debug($"Arguments: {string.Join(" ", launchArgs)}");
+
+        Logger.Debug($"Log file: {Logging.FileLocation}");
+
+        try
+        {
+#if __APPLE__
+            NativeNotify.Init();
+#endif
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        }
+        catch (Exception ex)
+        {
+            Logger.Fatal(ex, "Unhandled exception during startup");
+            throw;
+        }
+        finally
+        {
+            LogManager.Shutdown();
+        }
+
+        return 0;
+    }
+
+    private static void AttachParentConsole()
+    {
+#if _WIN32
+        AttachConsole(AttachParentProcess);
+#endif
+    }
+
+    public static AppBuilder BuildAvaloniaApp()
+    {
+        var builder = AppBuilder.Configure<App>()
+            .UsePlatformDetect()
+#if DEBUG
+            .WithDeveloperTools()
+#endif
+            .LogToTrace();
+
+        if (OperatingSystem.IsWindows() && App.LaunchSettings?.NoGpuFlag.Active == true)
+        {
+            builder = builder.With(new Win32PlatformOptions
+            {
+                RenderingMode = [Win32RenderingMode.Software]
+            });
+        }
+
+        if (OperatingSystem.IsLinux() &&
+            !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DEPTHSTRAP_FORCE_WAYLAND")))
+        {
+            App.Logger.Debug("Using Wayland backend (DEPTHSTRAP_FORCE_WAYLAND)");
+
+            builder = builder.UseWayland()
+                .With(new WaylandPlatformOptions
+                {
+                    UseDmabufSwapchain = true
+                });
+        }
+
+        return builder;
+    }
+}

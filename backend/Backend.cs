@@ -6,7 +6,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Froststrap.Backend;
+namespace Depthstrap.Backend;
 
 /// A Virtual Display mechanism for macOS
 internal partial class InternalVirtualDisplay

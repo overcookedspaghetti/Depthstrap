@@ -10,7 +10,7 @@ pub fn main() {
     }
     let version = super::version();
     let icon = path::xtask_root().join("icon512.png");
-    let desktop = path::dist().join("Froststrap.desktop");
+    let desktop = path::dist().join("Depthstrap.desktop");
 
     std::fs::create_dir_all(path::dist()).unwrap();
 
@@ -26,11 +26,11 @@ fn desktop_entry(version: &str) -> String {
         r#"
         [Desktop Entry]
         Type=Application
-        Name=Froststrap
+        Name=Depthstrap
         Comment=A fork of Fishstrap, focused on performance and customization
-        Exec=Froststrap %u
-        TryExec=Froststrap
-        Icon=froststrap
+        Exec=Depthstrap %u
+        TryExec=Depthstrap
+        Icon=depthstrap
         Terminal=false
         Categories=Game;
         MimeType=x-scheme-handler/roblox;x-scheme-handler/roblox-player;
@@ -48,7 +48,7 @@ fn build_nfpm(
     let nfpm = ensure_tool(&path::dist(), "nfpm",
         "https://github.com/goreleaser/nfpm/releases/download/v2.47.0/nfpm_2.47.0_Linux_x86_64.tar.gz", true);
 
-    let binary = output_dir.join("Froststrap");
+    let binary = output_dir.join("Depthstrap");
     let config = dist().join("nfpm.yaml");
     let post_install_path = dist().join("nfpm-postinstall.sh");
 
@@ -70,8 +70,8 @@ fn build_nfpm(
 
     for p in ["deb", "rpm", "archlinux"] {
         let out_name = match p {
-            "archlinux" => format!("Froststrap-linux-{}-{}.pkg.tar.zst", arch::target_arch(), p),
-            _ => format!("Froststrap-linux-{}.{}", arch::target_arch(), p),
+            "archlinux" => format!("Depthstrap-linux-{}-{}.pkg.tar.zst", arch::target_arch(), p),
+            _ => format!("Depthstrap-linux-{}.{}", arch::target_arch(), p),
         };
         
         log::info!("Building .{} via nFPM", p);
@@ -101,7 +101,7 @@ fn post_install_script() -> String {
           gtk-update-icon-cache -q /usr/share/icons/hicolor || :
         fi
 
-        /usr/bin/Froststrap --register-mime-types 2>/dev/null || :
+        /usr/bin/Depthstrap --register-mime-types 2>/dev/null || :
     "#,
     )
 }
@@ -116,12 +116,12 @@ fn nfpm_config(
 ) -> String {
     dedent(&format!(
         r#"
-            name: froststrap
+            name: depthstrap
             arch: {arch}
             platform: linux
             version: {version}
             license: MPL-2.0
-            maintainer: Froststrap
+            maintainer: Depthstrap
             description: Roblox bootstrapper and mod manager
 
             overrides:
@@ -140,13 +140,13 @@ fn nfpm_config(
 
             contents:
               - src: {}
-                dst: /usr/bin/Froststrap
+                dst: /usr/bin/Depthstrap
                 file_info:
                   mode: 0755
               - src: {}
-                dst: /usr/share/icons/hicolor/512x512/apps/froststrap.png
+                dst: /usr/share/icons/hicolor/512x512/apps/depthstrap.png
               - src: {}
-                dst: /usr/share/applications/Froststrap.desktop
+                dst: /usr/share/applications/Depthstrap.desktop
 
             scripts:
               postinstall: {}

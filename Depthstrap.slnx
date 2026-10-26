@@ -1,0 +1,9 @@
+﻿<Solution>
+  <Project Path="./Depthstrap/Depthstrap.csproj" />
+  <Project Path="./libs/ColorPicker/ColorPicker.csproj" />
+  <Project Path="./libs/LucideAvalonia/LucideAvalonia/LucideAvalonia.csproj" />
+  <Project Path="./libs/FluentAvalonia/src/FluentAvalonia/FluentAvalonia.csproj" />
+  <Properties Name="ExtensibilityGlobals" Scope="PostLoad">
+    <Property Name="RESX_NeutralResourcesLanguage" Value="en-GB" />
+  </Properties>
+</Solution>

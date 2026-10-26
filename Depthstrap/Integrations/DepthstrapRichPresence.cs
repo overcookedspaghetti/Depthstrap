@@ -1,0 +1,168 @@
+﻿// SPDX-FileCopyrightText: 2026 Froststrap
+//
+// SPDX-License-Identifier: MPL-2.0
+
+using System.Net.Sockets;
+using Depthstrap.Integrations.Discord;
+
+namespace Depthstrap.Integrations
+{
+    internal class DepthstrapRichPresence : IDisposable
+    {
+        // Discord application that shows "Playing Depthstrap". Upstream ID belongs to Froststrap;
+        // create your own at https://discord.com/developers/applications and paste its ID here.
+        public const string DiscordApplicationId = "1399535282713399418";
+
+        private readonly DiscordRpcClient? _rpcClient;
+        private readonly Timestamps _startTimestamps;
+        private readonly Stopwatch _uptimeStopwatch;
+        private bool _disposed;
+        private string _currentPage = "Idle";
+        private string? _currentDialog;
+        private string _lastState = "";
+
+        public bool IsConnected => _rpcClient?.IsInitialized == true;
+
+        public DepthstrapRichPresence()
+        {
+            _rpcClient = new DiscordRpcClient(DiscordApplicationId)
+            {
+                SkipIdenticalPresence = true,
+                ShutdownOnly = true
+            };
+
+            _rpcClient.OnReady += OnReady;
+
+            _startTimestamps = new Timestamps
+            {
+                Start = DateTime.UtcNow
+            };
+
+            _uptimeStopwatch = Stopwatch.StartNew();
+
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    _rpcClient.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.Error($"Failed to init RPC: {ex.Message}");
+                }
+            });
+        }
+
+        private void OnReady(object? sender, ReadyMessage args)
+        {
+            if (_disposed) return;
+
+            App.Logger.Info($"Connected as {args.User.Username}");
+
+            if (!_disposed)
+                UpdatePresence();
+        }
+
+        public void SetPage(string pageName)
+        {
+            if (_disposed) return;
+
+            _currentPage = pageName;
+            _currentDialog = null;
+            UpdatePresence();
+        }
+
+        public void SetDialog(string dialogName)
+        {
+            if (_disposed) return;
+
+            _currentDialog = dialogName;
+            UpdatePresence();
+        }
+
+        public void ClearDialog()
+        {
+            if (_disposed) return;
+
+            _currentDialog = null;
+            UpdatePresence();
+        }
+
+        public void UpdatePresence()
+        {
+            if (_disposed || _rpcClient == null || !_rpcClient.IsInitialized)
+                return;
+
+            string state = !string.IsNullOrEmpty(_currentDialog)
+                ? $"Page: {_currentPage} | Dialog: {_currentDialog}"
+                : $"Page: {_currentPage}";
+
+            if (state == _lastState)
+                return;
+
+            _lastState = state;
+
+            var presence = new DiscordActivity
+            {
+                Details = "Customize Roblox to your liking!",
+                State = state,
+                Timestamps = _startTimestamps,
+                Assets = new Assets
+                {
+                    LargeImageKey = "depthstrap",
+                    LargeImageText = "Depthstrap",
+                    SmallImageKey = "checkmark",
+                    SmallImageText = $"{App.Version}"
+                },
+                Buttons =
+                [
+                    new Button { Label = "GitHub", Url = "https://github.com/overcookedspaghetti/Depthstrap" }
+                ]
+            };
+
+            try
+            {
+                _rpcClient.SetPresence(presence);
+            }
+            catch (IOException ex) when (ex.InnerException is SocketException)
+            {
+                App.Logger.Error("Socket interrupted (Operation Canceled).");
+            }
+            catch (Exception ex)
+            {
+                App.Logger.Error("Unhandled exception: ", ex);
+            }
+        }
+
+        // i have refixed this fucking code 3 times now it BETTER not get removed
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            _disposed = true;
+
+            App.Logger.Info("Cleaning up Discord RPC");
+
+            if (_rpcClient != null)
+            {
+                try
+                {
+                    _rpcClient.OnReady -= OnReady;
+                    _rpcClient.Dispose();
+                }
+                catch (IOException ex) when (ex.InnerException is SocketException)
+                {
+                    // Ignore pipe closure issues.
+                }
+                catch (Exception ex)
+                {
+                    App.Logger.Error($"Cleanup error: {ex.Message}");
+                }
+            }
+
+            _uptimeStopwatch.Stop();
+            GC.SuppressFinalize(this);
+        }
+    }
+}

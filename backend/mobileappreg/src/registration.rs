@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-const BUNDLE_ID: &str = "xyz.froststrap.desktop";
+const BUNDLE_ID: &str = "app.depthstrap.desktop";
 pub const SCHEMES: [&str; 2] = ["roblox", "roblox-player"];
 
 /// Forces a re-register with `CoreServices`

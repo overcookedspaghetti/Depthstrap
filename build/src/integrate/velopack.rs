@@ -28,13 +28,13 @@ pub fn pack(version: String, pack_dir: &std::path::Path, entitlements: Option<&s
 
     std::fs::create_dir_all(&velopack_path).unwrap();
 
-    let main_exe = if consts::OS == "windows" { "Froststrap.exe" } else { "Froststrap" };
+    let main_exe = if consts::OS == "windows" { "Depthstrap.exe" } else { "Depthstrap" };
 
     let mut args: Vec<String> = [
         "pack",
-        "--packId", "Froststrap",
-        "--packTitle", "Froststrap",
-        "--packAuthors", "Froststrap",
+        "--packId", "Depthstrap",
+        "--packTitle", "Depthstrap",
+        "--packAuthors", "Depthstrap",
         "--packVersion", &version,
         "--packDir", &pack_path,
         "--outputDir", &velopack_path.to_string_lossy(),
@@ -49,7 +49,7 @@ pub fn pack(version: String, pack_dir: &std::path::Path, entitlements: Option<&s
     {
         args.extend([
             "--icon".into(),
-            path::git_root().join("Froststrap/Froststrap.ico").to_string_lossy().into_owned(),
+            path::git_root().join("Depthstrap/Depthstrap.ico").to_string_lossy().into_owned(),
             "--framework".into(),
             "vcredist143-x64".into(),
             "--msi".into(),
@@ -59,7 +59,7 @@ pub fn pack(version: String, pack_dir: &std::path::Path, entitlements: Option<&s
     #[cfg(target_os = "macos")]
     {
         use std::env;
-        args.extend(["--bundleId".to_string(), "xyz.froststrap.desktop".to_string()]);
+        args.extend(["--bundleId".to_string(), "app.depthstrap.desktop".to_string()]);
 
         if env::var("SIGN").is_ok_and(|v| v.eq_ignore_ascii_case("true")) {
             let Some(entitlements) = entitlements else {
@@ -75,7 +75,7 @@ pub fn pack(version: String, pack_dir: &std::path::Path, entitlements: Option<&s
                 "--signEntitlements".to_string(),
                 entitlements.to_string_lossy().into_owned(),
                 "--notaryProfile".to_string(),
-                "froststrap-notary".to_string(),
+                "depthstrap-notary".to_string(),
             ]);
         }
     }

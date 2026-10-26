@@ -44,13 +44,14 @@
                Condition="$([MSBuild]::IsOSPlatform('OSX'))" />
   </ItemGroup>
 
-  <Target Name="BuildBackend" BeforeTargets="BeforeBuild">
+  <!-- Pass -p:SkipRustBackend=true to compile the C# side without a Rust/MSVC toolchain (native notifications unavailable) -->
+  <Target Name="BuildBackend" BeforeTargets="BeforeBuild" Condition="'$(SkipRustBackend)' != 'true'">
     <Exec Command="cargo build $(PackageFlags) $(RustCargoFlags) $(RustCargoTargetArg)" WorkingDirectory="$(RustProjectDir)" />
     <Error Condition="!Exists('%(NativeLib.FullPath)')"
            Text="Expected cargo output not found at %(NativeLib.FullPath)" />
   </Target>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(SkipRustBackend)' != 'true'">
     <Content Include="@(NativeLib)" Link="%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>

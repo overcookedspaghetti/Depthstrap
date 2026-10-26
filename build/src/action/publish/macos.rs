@@ -35,10 +35,10 @@ fn find_dylib(file_name: &str) -> PathBuf {
 fn info_plist(version: &str) -> PListFile {
     PListFile::new("1.0").content(dict![
         string("CFBundleDevelopmentRegion", "en"),
-        string("CFBundleExecutable", "Froststrap"),
-        string("CFBundleIdentifier", "xyz.froststrap.desktop"),
-        string("CFBundleName", "Froststrap"),
-        string("CFBundleDisplayName", "Froststrap"),
+        string("CFBundleExecutable", "Depthstrap"),
+        string("CFBundleIdentifier", "app.depthstrap.desktop"),
+        string("CFBundleName", "Depthstrap"),
+        string("CFBundleDisplayName", "Depthstrap"),
         string("CFBundlePackageType", "APPL"),
         string("CFBundleInfoDictionaryVersion", "6.0"),
         string("CFBundleIconFile", "AppIcon"),
@@ -49,7 +49,7 @@ fn info_plist(version: &str) -> PListFile {
         string("LSApplicationCategoryType", "public.app-category.utilities"),
         entry("CFBundleSupportedPlatforms", array!["MacOSX"]),
         array("CFBundleURLTypes", [dict![
-            string("CFBundleURLName", "xyz.froststrap.roblox"),
+            string("CFBundleURLName", "app.depthstrap.roblox"),
             string("CFBundleTypeRole", "Viewer"),
             entry("CFBundleURLSchemes", array![
                 "roblox",
@@ -60,7 +60,7 @@ fn info_plist(version: &str) -> PListFile {
         ]]),
         array("UTExportedTypeDeclarations", [
             dict![
-                string("UTTypeIdentifier", "xyz.froststrap.roblox.place"),
+                string("UTTypeIdentifier", "app.depthstrap.roblox.place"),
                 string("UTTypeDescription", "Roblox Place"),
                 entry("UTTypeConformsTo", array!["public.data"]),
                 dict("UTTypeTagSpecification", [
@@ -68,7 +68,7 @@ fn info_plist(version: &str) -> PListFile {
                 ]),
             ],
             dict![
-                string("UTTypeIdentifier", "xyz.froststrap.roblox.model"),
+                string("UTTypeIdentifier", "app.depthstrap.roblox.model"),
                 string("UTTypeDescription", "Roblox Model"),
                 entry("UTTypeConformsTo", array!["public.data"]),
                 dict("UTTypeTagSpecification", [
@@ -80,12 +80,12 @@ fn info_plist(version: &str) -> PListFile {
             dict![
                 string("CFBundleTypeName", "Roblox Place"),
                 string("CFBundleTypeRole", "Viewer"),
-                entry("LSItemContentTypes", array!["xyz.froststrap.roblox.place"]),
+                entry("LSItemContentTypes", array!["app.depthstrap.roblox.place"]),
             ],
             dict![
                 string("CFBundleTypeName", "Roblox Model"),
                 string("CFBundleTypeRole", "Viewer"),
-                entry("LSItemContentTypes", array!["xyz.froststrap.roblox.model"]),
+                entry("LSItemContentTypes", array!["app.depthstrap.roblox.model"]),
             ],
         ]),
     ])
@@ -109,16 +109,16 @@ pub fn main() -> (PathBuf, PathBuf) {
     let dist = path::dist();
     fs::create_dir_all(&dist).unwrap();
 
-    let main_executable = publish_dir.join("Froststrap");
+    let main_executable = publish_dir.join("Depthstrap");
     let icon_path = path::xtask_root().join("macicon512.png");
 
-    let entitlements_path = path::bundling_artifacts().join("Froststrap.entitlements");
+    let entitlements_path = path::bundling_artifacts().join("Depthstrap.entitlements");
     fs::create_dir_all(path::bundling_artifacts()).expect("Failed to create bundling directory");
     entitlements()
         .write(&entitlements_path)
-        .expect("Failed to write Froststrap.entitlements");
+        .expect("Failed to write Depthstrap.entitlements");
 
-    let mut builder = AppBuilder::new("Froststrap")
+    let mut builder = AppBuilder::new("Depthstrap")
         .info_plist(info_plist(&version))
         .app_icon(icon_path)
         .binary(&main_executable);

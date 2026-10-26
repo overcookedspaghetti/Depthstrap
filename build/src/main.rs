@@ -1,4 +1,4 @@
-//! Build system for Froststrap
+//! Build system for Depthstrap
 
 #[cfg(target_os = "macos")]
 pub mod bundle;

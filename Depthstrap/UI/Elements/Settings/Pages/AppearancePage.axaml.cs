@@ -1,0 +1,48 @@
+// SPDX-FileCopyrightText: 2026 Froststrap
+//
+// SPDX-License-Identifier: MPL-2.0
+
+using Avalonia;
+using Avalonia.Controls;
+using Depthstrap.UI.ViewModels.Settings;
+
+namespace Depthstrap.UI.Elements.Settings.Pages;
+
+internal partial class AppearancePage : UserControl
+{
+    public AppearancePage()
+    {
+        InitializeComponent();
+
+        App.DepthRPC?.SetPage("Appearance");
+    }
+
+    private bool _isWindowsBackdropInitialized;
+
+    private async void WindowsBackdropChangeSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_isWindowsBackdropInitialized)
+        {
+            _isWindowsBackdropInitialized = true;
+            return;
+        }
+
+        if (e.AddedItems.Count == 0)
+            return;
+
+        var result = await Frontend.ShowMessageBox(
+            "Some of these options require an app restart, Do you want to restart now?",
+            MessageBoxImage.Information,
+            MessageBoxButton.YesNo
+        );
+
+        if (result == MessageBoxResult.Yes)
+        {
+            if (this.VisualRoot is MainWindow mainWindow &&
+                mainWindow.DataContext is MainWindowViewModel mainWindowViewModel)
+            {
+                mainWindowViewModel.RestartApp();
+            }
+        }
+    }
+}

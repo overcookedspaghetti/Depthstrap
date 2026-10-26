@@ -1,7 +1,7 @@
-Contributing to Froststrap
+Contributing to Depthstrap
 ==========================
 
-Thank you for showing interest in contributing to Froststrap!
+Thank you for showing interest in contributing to Depthstrap!
 
 
 Accepted contributions

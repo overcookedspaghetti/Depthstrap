@@ -1,7 +1,7 @@
-Building Froststrap
+Building Depthstrap
 ===================
 
-This is basic documentation on how to build Froststrap from source, with commands.
+This is basic documentation on how to build Depthstrap from source, with commands.
 
 Dependencies
 ------------
