@@ -22,11 +22,12 @@ namespace Depthstrap.Models.Persistable
         public bool AutoChangeTitle { get; set; } = true;
         public bool AutoChangeTitleWithPlayerCount { get; set; } = true;
         public bool AutoChangeIcon { get; set; }
-        public bool ShowUsingDepthstrapRPC { get; set; } = false;
+        public bool ShowUsingDepthstrapRPC { get; set; }
         public bool UseDiscordRichPresence { get; set; } = true;
         public bool HideRPCButtons { get; set; } = true;
         public bool EnableCustomStatusDisplay { get; set; } = true;
         public bool ShowAccountOnRichPresence { get; set; }
+        public bool ShowDeepwokenLocation { get; set; } = true;
         public bool StudioRPC { get; set; }
         public bool StudioThumbnailChanging { get; set; }
         public bool StudioEditingInfo { get; set; }

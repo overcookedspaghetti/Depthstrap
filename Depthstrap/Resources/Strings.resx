@@ -848,6 +848,12 @@ More information:
   <data name="Menu.Integrations.ShowAccountOnProfile.Title" xml:space="preserve">
     <value>Show Roblox Account</value>
   </data>
+  <data name="Menu.Integrations.ShowDeepwokenLocation.Description" xml:space="preserve">
+    <value>When playing Deepwoken, shows where you are (Etrean Luminant, the Depths, a dungeon, a PvP lobby...) instead of the server type. Detected from which Deepwoken server you joined.</value>
+  </data>
+  <data name="Menu.Integrations.ShowDeepwokenLocation.Title" xml:space="preserve">
+    <value>Show Deepwoken Location</value>
+  </data>
   <data name="Menu.Integrations.Custom.AppLocation" xml:space="preserve">
     <value>Application Location</value>
   </data>

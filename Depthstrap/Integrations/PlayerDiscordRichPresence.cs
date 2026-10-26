@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
+using Depthstrap.Integrations.Deepwoken;
 using Depthstrap.Integrations.Discord;
 using System.Net.Sockets;
 
@@ -388,6 +389,13 @@ namespace Depthstrap.Integrations
                 ServerType.Reserved => "In a Reserved server",
                 _ => $"by {universeDetails.Data.Creator.Name}" + (universeDetails.Data.Creator.HasVerifiedBadge ? " ☑️" : ""),
             };
+
+            // Deepwoken moves players between reserved servers, so the location says more than the server type
+            if (App.Settings.Prop.ShowDeepwokenLocation
+                && DeepwokenPlaces.GetLocation(activity.UniverseId, activity.PlaceId) is string location)
+            {
+                status = activity.ServerType == ServerType.Private ? $"{location} · Private server" : location;
+            }
 
             string universeName = universeDetails.Data.Name;
             if (universeName.Length < 2) universeName = $"{universeName}\x2800\x2800\x2800";

@@ -6765,6 +6765,24 @@ namespace Depthstrap.Resources {
                 return ResourceManager.GetString("Menu.Integrations.ShowAccountOnProfile.Title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When playing Deepwoken, shows where you are.
+        /// </summary>
+        public static string Menu_Integrations_ShowDeepwokenLocation_Description {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.ShowDeepwokenLocation.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Deepwoken Location.
+        /// </summary>
+        public static string Menu_Integrations_ShowDeepwokenLocation_Title {
+            get {
+                return ResourceManager.GetString("Menu.Integrations.ShowDeepwokenLocation.Title", resourceCulture);
+            }
+        }
 
         /// <summary>
         ///   Looks up a localized string similar to The Roblox game you&apos;re playing will be shown on your Discord profile. [Not working?]({0}).

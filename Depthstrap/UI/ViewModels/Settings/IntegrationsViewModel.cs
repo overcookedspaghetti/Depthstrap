@@ -251,6 +251,12 @@ namespace Depthstrap.UI.ViewModels.Settings
             set => App.Settings.Prop.ShowAccountOnRichPresence = value;
         }
 
+        public static bool DiscordDeepwokenLocation
+        {
+            get => App.Settings.Prop.ShowDeepwokenLocation;
+            set => App.Settings.Prop.ShowDeepwokenLocation = value;
+        }
+
         public static bool DisableAppPatchEnabled
         {
             get => App.Settings.Prop.UseDisableAppPatch;

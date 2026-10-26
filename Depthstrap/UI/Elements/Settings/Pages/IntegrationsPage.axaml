@@ -201,6 +201,13 @@ SPDX-License-Identifier: MPL-2.0
                 <ToggleSwitch IsChecked="{Binding DiscordAccountOnProfile, Mode=TwoWay}" />
             </controls:OptionControl>
 
+            <controls:OptionControl
+                                    Description="{x:Static resources:Strings.Menu_Integrations_ShowDeepwokenLocation_Description}"
+                                    Header="{x:Static resources:Strings.Menu_Integrations_ShowDeepwokenLocation_Title}"
+                                    IsEnabled="{Binding DiscordActivityEnabled}">
+                <ToggleSwitch IsChecked="{Binding DiscordDeepwokenLocation, Mode=TwoWay}" />
+            </controls:OptionControl>
+
             <TextBlock
                        FontSize="20"
                        Margin="0,16,0,0"
