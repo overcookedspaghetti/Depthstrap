@@ -48,6 +48,7 @@ namespace Depthstrap.UI.ViewModels.Settings
         private static readonly Dictionary<string, LucideIconNames> _pageIconMap = new()
         {
             ["integrations"] = LucideIconNames.Plus,
+            ["macros"] = LucideIconNames.Keyboard,
             ["behaviour"] = LucideIconNames.Play,
             ["linuxsettings"] = LucideIconNames.Settings,
             ["mods"] = LucideIconNames.BookOpen,
@@ -147,6 +148,7 @@ namespace Depthstrap.UI.ViewModels.Settings
         public ICommand SetLaunchModeCommand { get; }
 
         public IRelayCommand NavigateToIntegrationsCommand { get; }
+        public IRelayCommand NavigateToMacrosCommand { get; }
         public IRelayCommand NavigateToBehaviourCommand { get; }
         public IRelayCommand NavigateToLinuxSettingsCommand { get; }
         public IRelayCommand NavigateToMyModsCommand { get; }
@@ -191,6 +193,7 @@ namespace Depthstrap.UI.ViewModels.Settings
             SearchBar = new();
 
             NavigateToIntegrationsCommand = new RelayCommand(() => Navigate("integrations", Strings.Menu_Integrations_Title, Strings.Menu_Integrations_Description, new IntegrationsViewModel()));
+            NavigateToMacrosCommand = new RelayCommand(() => Navigate("macros", "Macros", "Deepwoken training, inventory and shop macros, plus a Discord ping hotkey.", new MacrosViewModel()));
             NavigateToBehaviourCommand = new RelayCommand(() => Navigate("behaviour", Strings.Menu_Behaviour_Title, Strings.Menu_Behaviour_Description, new BehaviourViewModel()));
             NavigateToLinuxSettingsCommand = new RelayCommand(() => Navigate("linuxsettings", Strings.Menu_LinuxSettings_Title, null!, new LinuxSettingsViewModel()));
             NavigateToPresetModsCommand = new RelayCommand(() => Navigate("mods", Strings.Menu_PresetMods_Title, Strings.Menu_PresetMods_Description, new ModsPresetsViewModel()));
@@ -287,6 +290,9 @@ namespace Depthstrap.UI.ViewModels.Settings
             {
                 case "Depthstrap.UI.ViewModels.Settings.IntegrationsViewModel":
                     NavigateToIntegrationsCommand.Execute(null);
+                    break;
+                case "Depthstrap.UI.ViewModels.Settings.MacrosViewModel":
+                    NavigateToMacrosCommand.Execute(null);
                     break;
                 case "Depthstrap.UI.ViewModels.Settings.BehaviourViewModel":
                     NavigateToBehaviourCommand.Execute(null);

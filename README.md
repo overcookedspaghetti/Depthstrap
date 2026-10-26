@@ -18,14 +18,25 @@
 </div>
 
 > [!NOTE]
-> Depthstrap is a **launcher**, not a cheat. It does not inject into Roblox, read game memory, or automate gameplay.
-> Everything it does happens outside the game client, the same way Bloxstrap/Fishstrap/Froststrap work.
+> Depthstrap does not inject into Roblox or read game memory. Everything it does happens outside the game client.
+> The optional macros send ordinary keyboard/mouse input and are **off by default** – use them at your own risk.
 
 ---
 
-## Deepwoken features (planned)
+## Deepwoken features
 
-- **Location-aware Discord status** – shows whether you're in Etris, the Depths, Layer 2, etc., based on which Deepwoken place you joined
+- **Location-aware Discord status** – shows whether you're in the Etrean Luminant, the Depths, a dungeon, a PvP lobby, etc., based on which Deepwoken place you joined
+- **Macros** (Settings → Macros, Windows only, off by default)
+  - Training: agility, fortitude, willpower, charisma auto-complete
+  - Inventory & shops: auto eat, sell, buy, bank, drop notes
+  - Flash map (hold M to peek at the map)
+  - Discord ping hotkey with screenshot and your Deepwoken location
+  - Macros only run while Roblox is focused; looping macros pause when you tab out
+
+  Combat macros (dash/roll techs, feints, uppercuts, mantra tech, Silentheart combos) are intentionally not included.
+
+## Planned
+
 - **Server tools** – pick a server region, rejoin your last server, keep favourite servers
 - **Build & notes panel** – keep build notes and quick links to the wiki and build planners
 - **Deepwoken performance preset** – one-click FastFlag/graphics profile tuned for Deepwoken

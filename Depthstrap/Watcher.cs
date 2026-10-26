@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Depthstrap.Integrations;
+using Depthstrap.Integrations.Deepwoken.Macros;
 
 namespace Depthstrap
 {
@@ -21,6 +22,8 @@ namespace Depthstrap
         public readonly WindowManipulation? WindowManipulation;
 
         public readonly Softkey? Softkey;
+
+        public readonly MacroManager? Macros;
 
         public readonly PlayerDiscordRichPresence? PlayerRichPresence;
         public readonly StudioDiscordRichPresence? StudioRichPresence;
@@ -88,6 +91,9 @@ namespace Depthstrap
 
                 if (_watcherData.LaunchMode == LaunchMode.Player && App.Settings.Prop.SoftKeyEnabled)
                     Softkey = new Softkey(_watcherData.ProcessId);
+
+                if (_watcherData.LaunchMode == LaunchMode.Player && App.Settings.Prop.MacrosEnabled && OperatingSystem.IsWindows())
+                    Macros = new MacroManager(_watcherData.ProcessId, ActivityWatcher);
 
                 _notifyIcon = new(this);
             }
@@ -431,6 +437,7 @@ namespace Depthstrap
             IntegrationWatcher?.Dispose();
             WindowManipulation?.Dispose();
             Softkey?.Dispose();
+            Macros?.Dispose();
             _notifyIcon?.Dispose();
             PlayerRichPresence?.Dispose();
             StudioRichPresence?.Dispose();

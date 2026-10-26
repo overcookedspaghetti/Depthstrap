@@ -28,6 +28,50 @@ namespace Depthstrap.Models.Persistable
         public bool EnableCustomStatusDisplay { get; set; } = true;
         public bool ShowAccountOnRichPresence { get; set; }
         public bool ShowDeepwokenLocation { get; set; } = true;
+
+        // Deepwoken macros
+        public bool MacrosEnabled { get; set; }
+
+        public MacroHotkey DiscordPingHotkey { get; set; }
+        public string DiscordPingWebhookUrl { get; set; } = "";
+        public string DiscordPingMessage { get; set; } = "Need help!";
+        public bool DiscordPingScreenshot { get; set; } = true;
+
+        public MacroHotkey MacroAgilityHotkey { get; set; }
+        public MacroHotkey MacroFortitudeHotkey { get; set; }
+        public MacroHotkey MacroWillpowerHotkey { get; set; }
+        public MacroHotkey MacroCharismaHotkey { get; set; }
+        public bool MacroFlashMap { get; set; }
+
+        public MacroHotkey MacroEatHotkey { get; set; }
+        public string MacroEatFood { get; set; } = "";
+        public string MacroEatSearchPos { get; set; } = "";
+        public string MacroEatFoodPos { get; set; } = "";
+
+        public MacroHotkey MacroSellHotkey { get; set; }
+        public int MacroSellRepeats { get; set; } = 1;
+        public string MacroSellItemPos { get; set; } = "";
+        public string MacroSellConfirmPos { get; set; } = "";
+
+        public MacroHotkey MacroBuyHotkey { get; set; }
+        public int MacroBuyRepeats { get; set; } = 5;
+        public string MacroBuySliderStartPos { get; set; } = "";
+        public string MacroBuySliderEndPos { get; set; } = "";
+        public string MacroBuySubmitPos { get; set; } = "";
+
+        public MacroHotkey MacroBankHotkey { get; set; }
+        public string MacroBankItem { get; set; } = "";
+        public int MacroBankRepeats { get; set; } = 1;
+        public string MacroBankSearchPos { get; set; } = "";
+        public string MacroBankItemPos { get; set; } = "";
+        public string MacroBankVowPos { get; set; } = "";
+
+        public MacroHotkey MacroNotesHotkey { get; set; }
+        public int MacroNotesRepeats { get; set; } = 1;
+        public string MacroNotesNotePos { get; set; } = "";
+        public string MacroNotesSliderStartPos { get; set; } = "";
+        public string MacroNotesSliderEndPos { get; set; } = "";
+        public string MacroNotesConfirmPos { get; set; } = "";
         public bool StudioRPC { get; set; }
         public bool StudioThumbnailChanging { get; set; }
         public bool StudioEditingInfo { get; set; }

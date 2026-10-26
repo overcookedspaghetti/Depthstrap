@@ -1,0 +1,252 @@
+<!--
+SPDX-FileCopyrightText: 2026 Depthstrap
+
+SPDX-License-Identifier: MPL-2.0
+-->
+
+<UserControl
+    x:Class="Depthstrap.UI.Elements.Settings.Pages.MacrosPage"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:Depthstrap.UI.Elements.Controls"
+    xmlns:ui="using:FluentAvalonia.UI.Controls"
+    xmlns:vm="clr-namespace:Depthstrap.UI.ViewModels.Settings"
+    x:DataType="vm:MacrosViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="14">
+            <ui:FAInfoBar
+                IsOpen="True"
+                IsClosable="False"
+                Severity="Warning"
+                Title="Use at your own risk"
+                Message="Macros send keyboard and mouse input to Roblox. Deepwoken can change its rules or detection at any time, and any ban applies to your account. Macros only run on Windows and only while Roblox is the focused window. A rising beep means a macro started, a falling beep means it stopped." />
+
+            <controls:OptionControl
+                Margin="0,8,0,0"
+                Header="Enable macros"
+                Description="Master switch. Changes apply the next time you launch Roblox.">
+                <ToggleSwitch IsChecked="{Binding MacrosEnabled, Mode=TwoWay}" />
+            </controls:OptionControl>
+
+            <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" Text="{Binding Status}" />
+
+            <StackPanel IsEnabled="{Binding MacrosEnabled}">
+                <TextBlock FontSize="20" FontWeight="Bold" Margin="0,16,0,0" Text="Discord ping" />
+                <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,10" Text="Press a hotkey in Roblox to post a message to a Discord channel, e.g. to call your friends when you are getting ganked. Your Deepwoken location is added automatically." />
+
+                <controls:CardExpander Header="Discord ping" Description="Sends a webhook message with an optional screenshot of the Roblox window." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to send the ping (5 second cooldown).">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding PingHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Webhook URL" Description="Discord channel settings, Integrations, Webhooks, Copy Webhook URL.">
+                        <TextBox Width="240" PlaceholderText="https://discord.com/api/webhooks/..." Text="{Binding PingWebhookUrl, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Message" Description="Text to send. Mentions like @here work if the webhook is allowed to use them.">
+                        <TextBox Width="240" PlaceholderText="" Text="{Binding PingMessage, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Attach screenshot" Description="Attach a screenshot of the Roblox window.">
+                        <ToggleSwitch IsChecked="{Binding PingScreenshot, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Test" Description="Send the message now (without a screenshot) to check the webhook works.">
+                        <Button Content="Send test ping" Command="{Binding SendTestPingCommand}" />
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <TextBlock FontSize="20" FontWeight="Bold" Margin="0,16,0,0" Text="Training" />
+                <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,10" Text="Training macros loop until you press their hotkey again. They pause automatically while Roblox is not the focused window." />
+
+                <controls:CardExpander Header="Agility" Description="Run on a treadmill: hold W and tap Q to keep going." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to start or stop the macro.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding AgilityHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <controls:CardExpander Header="Fortitude" Description="Boulder training: lifts, puts down and picks the boulder up again." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to start or stop the macro.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding FortitudeHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <controls:CardExpander Header="Willpower" Description="Keeps reading by clicking every 45 seconds." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to start or stop the macro.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding WillpowerHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <controls:CardExpander Header="Charisma" Description="Turn it on with the hotkey, then start typing a training line in chat (hey, wow, somet...) and the rest is typed and sent for you." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to turn charisma auto-complete on or off.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding CharismaHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <TextBlock FontSize="20" FontWeight="Bold" Margin="0,16,0,0" Text="Inventory and shops" />
+                <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,10" Text="These run once per key press. Use Pick to grab a screen position: press it, switch to Roblox within 5 seconds and hover over the spot." />
+
+                <controls:CardExpander Header="Auto eat" Description="Opens your inventory, searches for the food and eats it." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to start or stop the macro.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding EatHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Food name" Description="What to type into the inventory search.">
+                        <TextBox Width="240" PlaceholderText="e.g. Fish" Text="{Binding EatFood, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Search box" Description="Position of the inventory search box.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding EatSearchPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="EatSearchPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Food slot" Description="Position of the first search result.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding EatFoodPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="EatFoodPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <controls:CardExpander Header="Auto sell" Description="Sells an item to a merchant, confirming the dialog each time." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to start or stop the macro.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding SellHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Repeats" Description="How many times to repeat when the hotkey is pressed.">
+                        <NumericUpDown Width="140" Minimum="1" Maximum="999" Increment="1" FormatString="0" Value="{Binding SellRepeats, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Item" Description="Position of the item to sell.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding SellItemPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="SellItemPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Confirm" Description="Position of the confirm button.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding SellConfirmPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="SellConfirmPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <controls:CardExpander Header="Auto buy" Description="Talks to the merchant, drags the amount slider to max and buys." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to start or stop the macro.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding BuyHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Repeats" Description="How many times to repeat when the hotkey is pressed.">
+                        <NumericUpDown Width="140" Minimum="1" Maximum="999" Increment="1" FormatString="0" Value="{Binding BuyRepeats, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Slider start" Description="Left end of the amount slider.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding BuySliderStartPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="BuySliderStartPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Slider end" Description="Right end of the amount slider.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding BuySliderEndPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="BuySliderEndPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Buy button" Description="Position of the buy button.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding BuySubmitPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="BuySubmitPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <controls:CardExpander Header="Auto bank" Description="Searches for an item in your inventory and drags it into the bank." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to start or stop the macro.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding BankHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Item name" Description="What to type into the inventory search.">
+                        <TextBox Width="240" PlaceholderText="" Text="{Binding BankItem, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Repeats" Description="How many times to repeat when the hotkey is pressed.">
+                        <NumericUpDown Width="140" Minimum="1" Maximum="999" Increment="1" FormatString="0" Value="{Binding BankRepeats, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Search box" Description="Position of the inventory search box.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding BankSearchPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="BankSearchPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Item slot" Description="Position of the first search result.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding BankItemPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="BankItemPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Vow button (optional)" Description="Leave empty unless the bank asks you to confirm.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding BankVowPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="BankVowPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <controls:CardExpander Header="Auto drop notes" Description="Drops notes: picks the note, drags the amount slider and confirms." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Hotkey" Description="Press this key in Roblox to start or stop the macro.">
+                        <ComboBox MinWidth="160" ItemsSource="{Binding HotkeyOptions}" SelectedItem="{Binding NotesHotkey, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Repeats" Description="How many times to repeat when the hotkey is pressed.">
+                        <NumericUpDown Width="140" Minimum="1" Maximum="999" Increment="1" FormatString="0" Value="{Binding NotesRepeats, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Note" Description="Position of the note in your inventory.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding NotesNotePos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="NotesNotePos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Slider start" Description="Left end of the amount slider.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding NotesSliderStartPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="NotesSliderStartPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Slider end" Description="Right end of the amount slider.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding NotesSliderEndPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="NotesSliderEndPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    <controls:OptionControl Header="Confirm" Description="Position of the confirm button.">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBox Width="120" PlaceholderText="X Y" Text="{Binding NotesConfirmPos, Mode=TwoWay}" />
+                            <Button Content="Pick" Command="{Binding PickPositionCommand}" CommandParameter="NotesConfirmPos" IsEnabled="{Binding IsNotPicking}" />
+                        </StackPanel>
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+                <TextBlock FontSize="20" FontWeight="Bold" Margin="0,16,0,0" Text="Other" />
+                <TextBlock Foreground="{DynamicResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,10" Text="Small helpers." />
+
+                <controls:CardExpander Header="Flash map" Description="Hold M to look at the map; it closes as soon as you let go." Margin="0,0,0,8">
+                    <StackPanel>
+                    <controls:OptionControl Header="Enabled" Description="Close the map automatically when M is released.">
+                        <ToggleSwitch IsChecked="{Binding FlashMap, Mode=TwoWay}" />
+                    </controls:OptionControl>
+                    </StackPanel>
+                </controls:CardExpander>
+
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

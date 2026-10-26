@@ -176,6 +176,12 @@ SPDX-License-Identifier: MPL-2.0
                     </ui:FANavigationViewItem.Icon>
                 </ui:FANavigationViewItem>
 
+                <ui:FANavigationViewItem Content="Macros" Tag="macros" IsVisible="{x:Static gv:GlobalViewModel.IsWindows}">
+                    <ui:FANavigationViewItem.Icon>
+                        <ic:Lucide Icon="Keyboard" />
+                    </ui:FANavigationViewItem.Icon>
+                </ui:FANavigationViewItem>
+
                 <ui:FANavigationViewItem Content="{x:Static resources:Strings.Menu_Behaviour_Title}" Tag="behaviour">
                     <ui:FANavigationViewItem.Icon>
                         <ic:Lucide Icon="Play" />

@@ -203,6 +203,7 @@ namespace Depthstrap.UI.Elements.Settings
             return pageTag switch
             {
                 "integrations" => () => _viewModel?.NavigateToIntegrationsCommand.Execute(null),
+                "macros" => () => _viewModel?.NavigateToMacrosCommand.Execute(null),
                 "behaviour" => () => _viewModel?.NavigateToBehaviourCommand.Execute(null),
                 "linuxsettings" => () => _viewModel?.NavigateToLinuxSettingsCommand.Execute(null),
                 "mods" => () => _viewModel?.NavigateToPresetModsCommand.Execute(null),
@@ -220,6 +221,7 @@ namespace Depthstrap.UI.Elements.Settings
         private readonly Dictionary<string, (string Title, LucideIconNames Icon)> _pageInfo = new()
         {
             ["integrations"] = (Strings.Menu_Integrations_Title, LucideIconNames.Plus),
+            ["macros"] = ("Macros", LucideIconNames.Keyboard),
             ["behaviour"] = (Strings.Menu_Behaviour_Title, LucideIconNames.Play),
             ["linuxsettings"] = (Strings.Menu_LinuxSettings_Title, LucideIconNames.Settings),
             ["mods"] = (Strings.Menu_PresetMods_Title, LucideIconNames.BookOpen),
@@ -309,6 +311,7 @@ namespace Depthstrap.UI.Elements.Settings
         private static Control? ResolveViewForViewModel(object viewModel) => viewModel switch
         {
             IntegrationsViewModel => new IntegrationsPage(),
+            MacrosViewModel => new MacrosPage(),
             BehaviourViewModel => new BehaviourPage(),
             LinuxSettingsViewModel => new LinuxSettingsPage(),
             ModsPresetsViewModel => new ModsPresetsPage(),
